@@ -1,3 +1,4 @@
+import Joi from "@hapi/joi";
 import mongoose from "mongoose";
 
 const Student = mongoose.model(
@@ -9,6 +10,7 @@ const Student = mongoose.model(
       trim: true
     },
     teacher: {
+      type: String,
       required: true
     },
     grade: {
@@ -21,3 +23,25 @@ const Student = mongoose.model(
     }
   })
 );
+
+function validateStudent(student) {
+  const schema = {
+    name: Joi.string().required(),
+    grade: Joi.string().required(),
+    teacher: Joi.string().required(),
+    awards: Joi.array()
+  };
+  return Joi.validate(student, schema);
+}
+
+function validateUpdate(student) {
+  const schema = {
+    name: Joi.string(),
+    grade: Joi.string(),
+    teacher: Joi.string(),
+    awards: Joi.array()
+  };
+  return Joi.validate(student, schema);
+}
+
+export { Student, validateStudent, validateUpdate };

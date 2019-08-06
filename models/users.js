@@ -13,10 +13,20 @@ const User = mongoose.model(
       required: true
     },
     grade: {
+      type: String,
       enum: ["K", "1", "2", "3", "4", "5", "6", "Specialist", "Admin"],
       required: true
     }
   })
 );
 
-export default User;
+function validateUser(user) {
+  const schema = {
+    name: Joi.string().required(),
+    password: Joi.string().required(),
+    grade: Joi.enum().required()
+  };
+  return Joi.validate(user, schema);
+}
+
+export { User, validateUser };

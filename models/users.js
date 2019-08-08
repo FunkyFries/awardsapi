@@ -16,6 +16,9 @@ const User = mongoose.model(
     },
     profileId: {
       type: String
+    },
+    role: {
+      type: String
     }
   })
 );

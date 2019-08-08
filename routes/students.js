@@ -12,7 +12,11 @@ function ensureAuthenticated(req, res, next) {
 // Get all students
 router.get("/", ensureAuthenticated, async (req, res) => {
   const students = await Student.find().sort("name");
-  res.send(students);
+  if (req.user.role === "admin") {
+    res.send(students);
+  } else {
+    res.status(403).send("Not authorized");
+  }
 });
 
 // Get one student
@@ -29,14 +33,17 @@ router.post("/", ensureAuthenticated, async (req, res) => {
   const { error } = validateStudent(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const student = new Student({
-    name: req.body.name,
-    teacher: req.body.teacher,
-    grade: req.body.grade
-  });
-  await student.save();
-
-  res.send(student);
+  if (req.user.role === "admin") {
+    const student = new Student({
+      name: req.body.name,
+      teacher: req.body.teacher,
+      grade: req.body.grade
+    });
+    await student.save();
+    res.send(student);
+  } else {
+    res.status(403).send("Not authorized");
+  }
 });
 
 // Update student
@@ -59,11 +66,15 @@ router.put("/:id", ensureAuthenticated, async (req, res) => {
 
 // Delete student
 router.delete("/:id", ensureAuthenticated, async (req, res) => {
-  const student = await Student.findOneAndRemove(req.params.id);
+  if (req.user.role === "admin") {
+    const student = await Student.findOneAndRemove(req.params.id);
 
-  if (!student) return res.status(404).send("Student not found.");
+    if (!student) return res.status(404).send("Student not found.");
 
-  res.send(student);
+    res.send(student);
+  } else {
+    res.status(403).send("Not authorized");
+  }
 });
 
 export default router;

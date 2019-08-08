@@ -2,14 +2,21 @@ import express from "express";
 import { Student, validateStudent, validateUpdate } from "../models/students";
 const router = express.Router();
 
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.redirect("/auth/outlook");
+}
+
 // Get all students
-router.get("/", async (req, res) => {
+router.get("/", ensureAuthenticated, async (req, res) => {
   const students = await Student.find().sort("name");
   res.send(students);
 });
 
 // Get one student
-router.get("/:id", async (req, res) => {
+router.get("/:id", ensureAuthenticated, async (req, res) => {
   const student = await Student.findById(req.params.id);
 
   if (!student) return res.status(404).send("Student not found.");
@@ -18,7 +25,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Create a new student
-router.post("/", async (req, res) => {
+router.post("/", ensureAuthenticated, async (req, res) => {
   const { error } = validateStudent(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -33,7 +40,7 @@ router.post("/", async (req, res) => {
 });
 
 // Update student
-router.put("/:id", async (req, res) => {
+router.put("/:id", ensureAuthenticated, async (req, res) => {
   const { error } = validateUpdate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -51,7 +58,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Delete student
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", ensureAuthenticated, async (req, res) => {
   const student = await Student.findOneAndRemove(req.params.id);
 
   if (!student) return res.status(404).send("Student not found.");

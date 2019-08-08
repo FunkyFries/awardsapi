@@ -5,17 +5,17 @@ const User = mongoose.model(
   "Users",
   new mongoose.Schema({
     name: {
-      type: String,
-      required: true
-    },
-    password: {
-      type: String,
-      required: true
+      type: String
     },
     grade: {
       type: String,
-      enum: ["K", "1", "2", "3", "4", "5", "6", "Specialist", "Admin"],
-      required: true
+      enum: ["K", "1", "2", "3", "4", "5", "6", "Specialist", "Admin"]
+    },
+    email: {
+      type: String
+    },
+    profileId: {
+      type: String
     }
   })
 );
@@ -23,8 +23,8 @@ const User = mongoose.model(
 function validateUser(user) {
   const schema = {
     name: Joi.string().required(),
-    password: Joi.string().required(),
-    grade: Joi.enum().required()
+    grade: Joi.enum().required(),
+    email: Joi.string().required()
   };
   return Joi.validate(user, schema);
 }
